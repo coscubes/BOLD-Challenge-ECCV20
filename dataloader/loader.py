@@ -31,10 +31,15 @@ class BOLDTrainLoader(Dataset):
         vid_start   = int(self.data[index][-2])
         vid_end     = int(self.data[index][-1])
         emotions    = np.array(self.data[index][1:-2], dtype=np.float)
- 
+
+
         # Read the video using scikit-video library. Takes a lot of time :(
-        vid_array   = skvideo.io.vread(self.dataroot + "videos/" + path, 
+        vid_array = None
+        try:
+            vid_array   = skvideo.io.vread(self.dataroot + "videos/" + path, 
                                         num_frames = vid_end)
+        except FileNotFoundError:
+            print(path)
         vid_array   = vid_array[vid_start:]
         joints      = np.load(self.dataroot + "joints/" + path[:-4] + ".npy")
         joints      = joints[vid_start:vid_end]
@@ -45,7 +50,7 @@ class BOLDTrainLoader(Dataset):
                                     self.input_size)
             arr.sort()
             vid_array   = vid_array[arr]
-            joints      = joints[arr]
+            # joints      = joints[arr]
         else:
             # Append the same video if the size is smaller than input_size
             while vid_array.shape[0] < self.input_size:
@@ -81,8 +86,11 @@ class BOLDValLoader(Dataset):
         emotions    = np.array(self.data[index][1:-2], dtype=np.float)
  
         # Read the video using scikit-video library. Takes a lot of time :(
-        vid_array   = skvideo.io.vread(self.dataroot + "videos/" + path, 
+        try:
+            vid_array   = skvideo.io.vread(self.dataroot + "videos/" + path, 
                                         num_frames = vid_end)
+        except FileNotFoundError:
+            print(path)
         vid_array   = vid_array[vid_start:]
         joints      = np.load(self.dataroot + "joints/" + path[:-4] + ".npy")
         joints      = joints[vid_start:vid_end]
@@ -93,7 +101,7 @@ class BOLDValLoader(Dataset):
                                     self.input_size)
             arr.sort()
             vid_array   = vid_array[arr]
-            joints      = joints[arr]
+            # joints      = joints[arr]
         else:
             # Append the same video if the size is smaller than input_size
             while vid_array.shape[0] < self.input_size:
