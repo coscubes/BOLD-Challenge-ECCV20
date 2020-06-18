@@ -9,3 +9,6 @@ batch_size      = 4
 
 # Number for frames for inputting the data (int)
 input_frames    = 32
+
+# Number of processes to launch
+num_workers     = 10
