@@ -12,3 +12,6 @@ input_frames    = 32
 
 # Number of processes to launch
 num_workers     = 10
+
+# Shape of the input = height x height
+height          = 224

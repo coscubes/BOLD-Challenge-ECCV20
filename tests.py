@@ -6,21 +6,24 @@ from dataloader.valLoader import *
 import config
 import time
 
+
 train_loader = BOLDTrainLoader(  
     dataroot    = config.dataset_root, 
-    input_size  = config.input_frames
+    input_size  = config.input_frames,
+    height      = config.height
 )
 
-# val_loader = BOLDValLoader(
-#     dataroot    = config.dataset_root, 
-#     input_size  = config.input_frames
-# )
+val_loader = BOLDValLoader(
+    dataroot    = config.dataset_root, 
+    input_size  = config.input_frames,
+    height      = config.height
+)
 
 total_time = 0
-for i in range(len(train_loader)):
+for i in range(len(val_loader)):
     now = time.time()
-    train_loader[i]
+    val_loader[i]
     total_time += time.time() - now
 
 print(total_time)
-print(total_time / len(train_loader))
+print(total_time / len(val_loader))

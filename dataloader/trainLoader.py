@@ -7,7 +7,7 @@ import skvideo.io
 import random
 
 class BOLDTrainLoader(Dataset):
-    def __init__(self, dataroot = None, input_size = 32):
+    def __init__(self, dataroot = None, input_size = 32, height = 256):
         super().__init__()
         # We have modified the orginal annotations to discard the 
         # unrequired data and restructure it.
@@ -16,6 +16,7 @@ class BOLDTrainLoader(Dataset):
         # Num vids with less than 32 frames = 1168
         self.dataroot       = dataroot
         self.input_size     = input_size
+        self.height         = height
 
         # Read data from CSV
         reader      = csv.reader(open(self.dataroot + "annotations_modified/train.csv", "r"), 
@@ -54,7 +55,9 @@ class BOLDTrainLoader(Dataset):
         except FileNotFoundError:
             print(path)
             return
-
+        
+        # I know it is redundant code but please keep it as it is.
+        # Debugging it is hard
         if joints.shape[0] == vid_array.shape[0]:
             # Randomly select frames from the given video of input_size
             joints      = joints[vid_start : vid_end]
@@ -69,11 +72,82 @@ class BOLDTrainLoader(Dataset):
                 joints      = joints[arr]
             else:
                 # Append the same video if the size is smaller than input_size
-
                 while vid_array.shape[0] < self.input_size:
                     vid_array = np.concatenate([vid_array, vid_array], axis = 0)
                     joints    = np.concatenate([joints, joints], axis = 0)
+                
+                arr         = random.sample(range(len(vid_array)), 
+                                        self.input_size)
+                arr.sort()
+                vid_array   = vid_array[arr]
+                
+                joints      = joints[arr]
+        else:
+            if vid_array.shape[0] < joints.shape[0]:
+                joints      = joints[:vid_array.shape[0]]
+            else:
+                vid_array   = vid_array[:joints.shape[0]]
 
-        print(joints.shape, vid_array.shape, vid_end - vid_start)
-        return vid_array, joints, emotions
+            if vid_array.shape[0] > self.input_size:
+                # The ideal case where num frames is greater than input size
+                arr         = random.sample(range(len(vid_array)), 
+                                        self.input_size)
+                arr.sort()
+                vid_array   = vid_array[arr]
+                
+                joints      = joints[arr]
+            else:
+                # Append the same video if the size is smaller than input_size
+                while vid_array.shape[0] < self.input_size:
+                    vid_array = np.concatenate([vid_array, vid_array], axis = 0)
+                    joints    = np.concatenate([joints, joints], axis = 0)
+                arr         = random.sample(range(len(vid_array)), 
+                                        self.input_size)
+                arr.sort()
+                vid_array   = vid_array[arr]
+                
+                joints      = joints[arr]
+        
+        # print(joints.shape, vid_array.shape, vid_end - vid_start)
+        # Crop the video to height x height
+        cropped_vid = []
+        joint_vec   = []
+        vid_height  = vid_array.shape[1]
+        vid_width   = vid_array.shape[2]
+
+        for i in range(self.input_size):
+            j_frame = joints[i]
+            x,y,z   = np.mean(j_frame[2:].reshape(18, 3), axis=0)
+            
+            left    = x - (self.height / 2)
+            top     = y - (self.height / 2)
+            right   = x + (self.height / 2)
+            bottom  = y + (self.height / 2)
+            if top < 0:
+                top     = 0
+                bottom  = top + self.height
+            if bottom > vid_height:
+                bottom = vid_height
+                top    = bottom - self.height
+            if left < 0:
+                left    = 0
+                right   = left + self.height                
+            if right > vid_width:
+                right = vid_width
+                left  = vid_width - self.height
+
+            frame = vid_array[i][ int(top):int(bottom), int(left):int(right)]
+            if frame.shape != (224, 224, 3):
+                print(vid_height, vid_width, x, y, top, bottom, left, right, frame.shape)
+            cropped_vid.append(frame)
+            j_frame     = j_frame[2:].reshape(18, 3)
+            j_frame     -= np.array([x, y, 0])
+            j_frame     = j_frame.ravel()
+            joint_vec.append(j_frame)
+
+        cropped_vid = np.array(cropped_vid)
+        joint_vec   = np.array(joint_vec)
+        # print(cropped_vid.shape, joint_vec.shape)
+        return cropped_vid, joint_vec, emotions
+
 
