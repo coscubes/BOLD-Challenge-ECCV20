@@ -32,6 +32,7 @@ class BOLDTrainLoader(Dataset):
             else:
                 temp.append(self.data[i])
         self.data   = temp
+        random.shuffle(self.data)
 
     def __len__(self):
         return len(self.data)
@@ -43,31 +44,36 @@ class BOLDTrainLoader(Dataset):
         vid_end     = int(self.data[index][-1])
         person_id   = int(self.data[index][-3])
         emotions    = np.array(self.data[index][1:-3], dtype=np.float)
-
+        joints      = np.load(self.dataroot + "joints/" + path[:-4] + ".npy")
+        joints      = joints[np.where(joints[:,1] == person_id)] 
+        
         # Read the video using scikit-video library. Takes a lot of time :(
-        vid_array = None
+        vid_array   = None
         try:
             vid_array   = skvideo.io.vread(self.dataroot + "videos/" + path) 
-                                        # num_frames = vid_end)
         except FileNotFoundError:
             print(path)
             return
-        # vid_array   = vid_array[vid_start:]
-        joints      = np.load(self.dataroot + "joints/" + path[:-4] + ".npy")
-        # joints      = joints[vid_start:vid_end]
-        if (vid_end - vid_start) > self.input_size:
-            # Randomly select frames from the given video of input_size
-            arr         = random.sample(range(vid_end - vid_start), 
-                                    self.input_size)
-            arr.sort()
-            vid_array   = vid_array[arr]
-            
-            joints      = joints[arr]
-        else:
-            # Append the same video if the size is smaller than input_size
-            while vid_array.shape[0] < self.input_size:
-                vid_array = np.concatenate([vid_array, vid_array], axis = 0)
-                joints    = np.concatenate([joints, joints], axis = 0)
 
+        if joints.shape[0] == vid_array.shape[0]:
+            # Randomly select frames from the given video of input_size
+            joints      = joints[vid_start : vid_end]
+            vid_array   = vid_array[vid_start : vid_end]
+            if vid_end - vid_start > self.input_size:
+                # The ideal case where num frames is greater than input size
+                arr         = random.sample(range(len(vid_array)), 
+                                        self.input_size)
+                arr.sort()
+                vid_array   = vid_array[arr]
+                
+                joints      = joints[arr]
+            else:
+                # Append the same video if the size is smaller than input_size
+
+                while vid_array.shape[0] < self.input_size:
+                    vid_array = np.concatenate([vid_array, vid_array], axis = 0)
+                    joints    = np.concatenate([joints, joints], axis = 0)
+
+        print(joints.shape, vid_array.shape, vid_end - vid_start)
         return vid_array, joints, emotions
 
