@@ -10,12 +10,14 @@ os.environ["CUDA_VISIBLE_DEVICES"]="3"
 
 train_data = BOLDTrainLoader(
     dataroot    = config.dataset_root,
-    input_size  = config.input_frames
+    input_size  = config.input_frames,
+    height      = config.height
 )
 
 val_data =  BOLDValLoader(
     dataroot    = config.dataset_root,
-    input_size  = config.input_frames
+    input_size  = config.input_frames,
+    height      = config.height
 )
 
 train_loader = DataLoader(
