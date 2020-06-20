@@ -34,7 +34,6 @@ class BOLDTrainLoader(Dataset):
                 temp.append(self.data[i])
         self.data   = temp
         self.transform = transform
-        random.shuffle(self.data)
 
     def __len__(self):
         return len(self.data)
@@ -44,7 +43,7 @@ class BOLDTrainLoader(Dataset):
         path        = self.data[index][0]
         vid_start   = int(self.data[index][-2])
         vid_end     = int(self.data[index][-1])
-        person_id   = int(self.data[index][-3])
+        person_id   = int(round(float(self.data[index][-3])))
         emotions    = np.array(self.data[index][1:-3], dtype=np.float)
         joints      = np.load(self.dataroot + "joints/" + path[:-4] + ".npy")
         joints      = joints[np.where(joints[:,1] == person_id)] 

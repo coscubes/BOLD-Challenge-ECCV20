@@ -5,7 +5,7 @@ dataset_root    = "/src/BOLD_public/"
 learning_rate   = 0.1
 
 # Batch_size (int)
-batch_size      = 4
+batch_size      = 2
 
 # Number of epochs
 num_epochs      = 10
@@ -14,7 +14,7 @@ num_epochs      = 10
 input_frames    = 16
 
 # Number of processes to launch
-num_workers     = 10
+num_workers     = 2
 
 # Shape of the input = height x height
 height          = 224

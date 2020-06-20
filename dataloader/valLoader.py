@@ -34,7 +34,6 @@ class BOLDValLoader(Dataset):
                 temp.append(self.data[i])
         self.data   = temp
         self.transform = transform
-        random.shuffle(self.data)
 
     def __len__(self):
         return len(self.data)

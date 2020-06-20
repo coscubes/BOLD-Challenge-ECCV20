@@ -51,7 +51,6 @@ train_loader = DataLoader(
     train_data,
     batch_size  = config.batch_size,
     shuffle     = True,
-    num_workers = config.num_workers
 )
 
 val_loader = DataLoader(
@@ -68,13 +67,15 @@ else:
 
 print("Using ", device, " for training")
 
-optmizer    = Adam(net.parameters(), lr = config.learning_rate)
 criterion   = torch.nn.MSELoss(reduction='sum')
 model       = InceptionI3d(num_classes=400, in_channels=3)
-model.replace_logits(config.logits)
-model.load_state_dict("checkpoints/rgb_charades.pt")
-model.to(device)
 
+model.load_state_dict(torch.load("checkpoints/rgb_imagenet.pt"))
+model.replace_logits(config.logits)
+model.to(device)
+optmizer    = Adam(model.parameters(), lr = config.learning_rate)
+
+print("We reached here")
 for epoch, (vid, joints, emotions) in enumerate(train_loader):
     print(vid.shape, emotions.shape)
     break
