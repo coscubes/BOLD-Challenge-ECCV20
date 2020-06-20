@@ -52,3 +52,6 @@ optmizer    = Adam(net.parameters(), lr = config.learning_rate)
 criterion   = torch.nn.MSELoss(reduction='sum')
 model       = InceptionI3d(num_classes=400, in_channels=3)
 model.replace_logits(config.logits)
+model.load_state_dict("checkpoints/rgb_charades.pt")
+model.to(device)
+
