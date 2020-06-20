@@ -1,5 +1,5 @@
 # Path to dataset (str)
-dataset_root    = "/media/kaustubh/New_Volume/kaustubh_imp/datasets/BOLD_public/"
+dataset_root    = "/src/BOLD_public/"
 
 # Learning Rate (float) <1.0
 learning_rate   = 0.1

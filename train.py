@@ -37,20 +37,20 @@ train_data = BOLDTrainLoader(
     dataroot    = config.dataset_root,
     input_size  = config.input_frames,
     height      = config.height,
-    transforms  = train_transforms  
+    transform   = train_transforms
 )
 
 val_data =  BOLDValLoader(
     dataroot    = config.dataset_root,
     input_size  = config.input_frames,
-    height      = config.height
+    height      = config.height,
+    transform   = val_transforms
 )
 
 train_loader = DataLoader(
     train_data,
     batch_size  = config.batch_size,
     shuffle     = True,
-    transforms  = train_transforms,
     num_workers = config.num_workers
 )
 
@@ -58,7 +58,6 @@ val_loader = DataLoader(
     val_data,
     batch_size  = config.batch_size,
     shuffle     = False,
-    transforms  = val_transforms,
     num_workers = config.num_workers
 )
 

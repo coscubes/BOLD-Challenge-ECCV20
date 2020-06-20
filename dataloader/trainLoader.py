@@ -7,7 +7,7 @@ import skvideo.io
 import random
 
 class BOLDTrainLoader(Dataset):
-    def __init__(self, dataroot = None, input_size = 32, height = 256):
+    def __init__(self, dataroot = None, input_size = 32, height = 256, transform=None):
         super().__init__()
         # We have modified the orginal annotations to discard the 
         # unrequired data and restructure it.
@@ -33,6 +33,7 @@ class BOLDTrainLoader(Dataset):
             else:
                 temp.append(self.data[i])
         self.data   = temp
+        self.transform = transform
         random.shuffle(self.data)
 
     def __len__(self):
@@ -148,6 +149,8 @@ class BOLDTrainLoader(Dataset):
         cropped_vid = np.array(cropped_vid)
         joint_vec   = np.array(joint_vec)
         # print(cropped_vid.shape, joint_vec.shape)
+        if self.transform:
+            cropped_vid = self.transform(cropped_vid)
         return cropped_vid, joint_vec, emotions
 
 
