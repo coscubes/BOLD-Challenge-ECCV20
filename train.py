@@ -50,6 +50,7 @@ train_loader = DataLoader(
     train_data,
     batch_size  = config.batch_size,
     shuffle     = True,
+    transforms  = train_transforms,
     num_workers = config.num_workers
 )
 
@@ -57,6 +58,7 @@ val_loader = DataLoader(
     val_data,
     batch_size  = config.batch_size,
     shuffle     = False,
+    transforms  = val_transforms,
     num_workers = config.num_workers
 )
 
