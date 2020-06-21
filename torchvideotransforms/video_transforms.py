@@ -340,6 +340,7 @@ class ColorJitter(object):
         Returns:
         list PIL.Image : list of transformed PIL.Image
         """
+
         if isinstance(clip[0], np.ndarray):
             raise TypeError(
                 'Color jitter not yet implemented for numpy arrays')

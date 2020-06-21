@@ -1,5 +1,7 @@
 # Path to dataset (str)
-dataset_root    = "/src/BOLD_public/"
+# "/src/BOLD_public/"
+# "/media/kaustubh/New_Volume/kaustubh_imp/datasets/BOLD_public/"
+dataset_root    = "/media/kaustubh/New_Volume/kaustubh_imp/datasets/BOLD_public/"
 
 # Learning Rate (float) <1.0
 learning_rate   = 0.1
@@ -14,7 +16,7 @@ num_epochs      = 10
 input_frames    = 16
 
 # Number of processes to launch
-num_workers     = 2
+num_workers     = 1
 
 # Shape of the input = height x height
 height          = 224

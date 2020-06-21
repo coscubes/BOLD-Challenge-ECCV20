@@ -80,7 +80,7 @@ def normalize(clip, mean, std, inplace=False):
 
     if not inplace:
         clip = clip.clone()
-
+        
     dtype = clip.dtype
     mean = torch.as_tensor(mean, dtype=dtype, device=clip.device)
     std = torch.as_tensor(std, dtype=dtype, device=clip.device)

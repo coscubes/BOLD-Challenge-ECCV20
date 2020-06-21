@@ -3,6 +3,7 @@ import csv
 import cv2
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms, utils
+from torchvision.transforms.functional import to_pil_image
 import skvideo.io
 import random
 
@@ -148,6 +149,7 @@ class BOLDValLoader(Dataset):
         cropped_vid = np.array(cropped_vid)
         joint_vec   = np.array(joint_vec)
 
+        cropped_vid = [to_pil_image(img) for img in cropped_vid]
         if self.transform:
             cropped_vid = self.transform(cropped_vid)
         

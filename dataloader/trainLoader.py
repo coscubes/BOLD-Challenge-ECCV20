@@ -1,10 +1,12 @@
 import numpy as np
 import csv
 import cv2
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset
 from torchvision import transforms, utils
+import torch
 import skvideo.io
 import random
+from torchvision.transforms.functional import to_pil_image
 
 class BOLDTrainLoader(Dataset):
     def __init__(self, dataroot = None, input_size = 32, height = 256, transform=None):
@@ -147,9 +149,8 @@ class BOLDTrainLoader(Dataset):
 
         cropped_vid = np.array(cropped_vid)
         joint_vec   = np.array(joint_vec)
-        # print(cropped_vid.shape, joint_vec.shape)
+        
+        cropped_vid = [to_pil_image(img) for img in cropped_vid]
         if self.transform:
             cropped_vid = self.transform(cropped_vid)
-        return cropped_vid, joint_vec, emotions
-
-
+        return torch.FloatTensor(cropped_vid), torch.FloatTensor(joint_vec), torch.FloatTensor(emotions)
