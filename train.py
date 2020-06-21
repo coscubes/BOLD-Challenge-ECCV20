@@ -21,16 +21,14 @@ import os
 os.environ["CUDA_VISIBLE_DEVICES"]="3"
 
 train_transforms    = Compose([
-    ToStackedTensor(),
     ColorJitter(0.5, 0.5, 0.25),
+    ClipToTensor(channel_nb=3),
     Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-    ToTensor()
 ])
 
 val_transforms      = Compose([
-    ToStackedTensor(),
+    ClipToTensor(channel_nb=3),
     Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-    ToTensor()
 ])
 
 train_data = BOLDTrainLoader(
@@ -48,9 +46,17 @@ val_data =  BOLDValLoader(
 )
 
 train_loader = DataLoader(
-    train_data,
+    dataset     = train_data,
     batch_size  = config.batch_size,
     shuffle     = True,
+    num_workers = config.num_workers
+)
+
+val_loader = DataLoader(
+    dataset     = val_data,
+    batch_size  = config.batch_size,
+    shuffle     = False,
+    num_workers = config.num_workers
 )
 
 val_loader = DataLoader(
@@ -76,7 +82,9 @@ model.to(device)
 optmizer    = Adam(model.parameters(), lr = config.learning_rate)
 
 print("We reached here")
-for epoch, (vid, joints, emotions) in enumerate(train_loader):
-    print(vid.shape, emotions.shape)
-    break
+
+for epoch in range(len(config.num_epochs)):
+    for i, (vid, joints, emotions) in enumerate(train_loader):
+        preds   = model(vid)
+        loss    = criterion(preds, emotions)
 
