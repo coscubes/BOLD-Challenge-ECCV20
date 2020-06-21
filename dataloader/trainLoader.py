@@ -53,7 +53,8 @@ class BOLDTrainLoader(Dataset):
         # Read the video using scikit-video library. Takes a lot of time :(
         vid_array   = None
         try:
-            vid_array   = skvideo.io.vread(self.dataroot + "videos/" + path) 
+            vid_array     = self.get_video(self.dataroot + "videos/" + path)
+            # vid_array   = skvideo.io.vread(self.dataroot + "videos/" + path) 
         except FileNotFoundError:
             print(path)
             return
@@ -154,3 +155,29 @@ class BOLDTrainLoader(Dataset):
         if self.transform:
             cropped_vid = self.transform(cropped_vid)
         return torch.FloatTensor(cropped_vid), torch.FloatTensor(joint_vec), torch.FloatTensor(emotions)
+
+    def get_video(self, file):
+        images = []
+
+        cap = cv2.VideoCapture(file)
+        while not cap.isOpened():
+            cap = cv2.VideoCapture(file)
+            cv2.waitKey(1000)
+
+        pos_frame = cap.get(cv2.CAP_PROP_POS_FRAMES)
+        while True:
+            flag, frame = cap.read()
+            if flag:
+                images.append(frame)
+
+                pos_frame = cap.get(cv2.CAP_PROP_POS_FRAMES)
+            else:
+                cap.set(cv2.CAP_PROP_POS_FRAMES, pos_frame-1)
+                cv2.waitKey(1000)
+
+            if cv2.waitKey(10) == 27:
+                break
+            if cap.get(cv2.CAP_PROP_POS_FRAMES) == cap.get(cv2.CAP_PROP_POS_FRAMES):
+                break
+
+        return np.array(images)

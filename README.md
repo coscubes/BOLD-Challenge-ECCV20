@@ -10,5 +10,5 @@ Removed Age, Gender, Confidence values.
 See config.py to set various parameters.
 
 ## Acknowledgements
-I3D model and code: https://github.com/piergiaj/pytorch-i3d
+I3D model and code: https://github.com/piergiaj/pytorch-i3d  
 Torch Video Transforms: https://github.com/hassony2/torch_videovision.git

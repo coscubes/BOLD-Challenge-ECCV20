@@ -7,7 +7,7 @@ dataset_root    = "/media/kaustubh/New_Volume/kaustubh_imp/datasets/BOLD_public/
 learning_rate   = 0.1
 
 # Batch_size (int)
-batch_size      = 2
+batch_size      = 4
 
 # Number of epochs
 num_epochs      = 10
@@ -16,7 +16,7 @@ num_epochs      = 10
 input_frames    = 16
 
 # Number of processes to launch
-num_workers     = 1
+num_workers     = 0
 
 # Shape of the input = height x height
 height          = 224
