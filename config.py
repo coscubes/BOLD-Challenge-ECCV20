@@ -16,7 +16,7 @@ num_epochs      = 10
 input_frames    = 16
 
 # Number of processes to launch
-num_workers     = 0
+num_workers     = 10
 
 # Shape of the input = height x height
 height          = 224
@@ -26,3 +26,6 @@ device          = None
 
 # Number of outputs
 logits          = 29
+
+# TODO Sets GPU ID on the server
+server          = False

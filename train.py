@@ -18,7 +18,9 @@ from    models.I3D import InceptionI3d
 
 # Set the right GPU on server
 import os
-os.environ["CUDA_VISIBLE_DEVICES"]="3"
+
+if config.server:
+    os.environ["CUDA_VISIBLE_DEVICES"]="3"
 
 train_transforms    = Compose([
     ColorJitter(0.5, 0.5, 0.25),

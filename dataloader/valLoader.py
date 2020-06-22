@@ -7,8 +7,12 @@ from torchvision.transforms.functional import to_pil_image
 import skvideo.io
 import random
 
-class BOLDValLoader(Dataset):
-    def __init__(self, dataroot = None, input_size = 32, height = 256, transform = None):
+from    decord import VideoReader
+from    decord import cpu, gpu
+import  decord
+
+class BOLDTrainLoader(Dataset):
+    def __init__(self, dataroot = None, input_size = 32, height = 256, transform=None):
         super().__init__()
         # We have modified the orginal annotations to discard the 
         # unrequired data and restructure it.
@@ -18,6 +22,7 @@ class BOLDValLoader(Dataset):
         self.dataroot       = dataroot
         self.input_size     = input_size
         self.height         = height
+        decord.bridge.set_bridge('torch')
 
         # Read data from CSV
         reader      = csv.reader(open(self.dataroot + "annotations_modified/val.csv", "r"), 
@@ -27,7 +32,6 @@ class BOLDValLoader(Dataset):
                                 delimiter=",")
         rejected    = [i[0] for  i in list(rejected)]
         temp        = []
-        
         for i in range(len(self.data)):
             if self.data[i][0] in rejected:
                 continue
@@ -40,77 +44,50 @@ class BOLDValLoader(Dataset):
         return len(self.data)
     
     def __getitem__(self, index):
-        # Separate the self.data row its components
         path        = self.data[index][0]
         vid_start   = int(self.data[index][-2])
         vid_end     = int(self.data[index][-1])
-        person_id   = int(self.data[index][-3])
+        person_id   = int(round(float(self.data[index][-3])))
         emotions    = np.array(self.data[index][1:-3], dtype=np.float)
         joints      = np.load(self.dataroot + "joints/" + path[:-4] + ".npy")
         joints      = joints[np.where(joints[:,1] == person_id)] 
-        
-        # Read the video using scikit-video library. Takes a lot of time :(
         vid_array   = None
+        
         try:
-            vid_array   = skvideo.io.vread(self.dataroot + "videos/" + path) 
+            vid_array     = self.get_video(self.dataroot + "videos/" + path)
+            # vid_array   = skvideo.io.vread(self.dataroot + "videos/" + path) 
         except FileNotFoundError:
-            print(path)
+            print("FileNotFoundError", path)
             return
-        
-        # I know it is redundant code but please keep it as it is.
-        # Debugging it is hard
-        if joints.shape[0] == vid_array.shape[0]:
-            # Randomly select frames from the given video of input_size
-            joints      = joints[vid_start : vid_end]
-            vid_array   = vid_array[vid_start : vid_end]
-            if vid_end - vid_start > self.input_size:
-                # The ideal case where num frames is greater than input size
-                arr         = random.sample(range(len(vid_array)), 
-                                        self.input_size)
-                arr.sort()
-                vid_array   = vid_array[arr]
-                
-                joints      = joints[arr]
-            else:
-                # Append the same video if the size is smaller than input_size
-                while vid_array.shape[0] < self.input_size:
-                    vid_array = np.concatenate([vid_array, vid_array], axis = 0)
-                    joints    = np.concatenate([joints, joints], axis = 0)
-                
-                arr         = random.sample(range(len(vid_array)), 
-                                        self.input_size)
-                arr.sort()
-                vid_array   = vid_array[arr]
-                
-                joints      = joints[arr]
-        else:
-            if vid_array.shape[0] < joints.shape[0]:
-                joints      = joints[:vid_array.shape[0]]
-            else:
-                vid_array   = vid_array[:joints.shape[0]]
 
-            if vid_array.shape[0] > self.input_size:
-                # The ideal case where num frames is greater than input size
-                arr         = random.sample(range(len(vid_array)), 
-                                        self.input_size)
-                arr.sort()
-                vid_array   = vid_array[arr]
-                
-                joints      = joints[arr]
-            else:
-                # Append the same video if the size is smaller than input_size
-                while vid_array.shape[0] < self.input_size:
-                    vid_array = np.concatenate([vid_array, vid_array], axis = 0)
-                    joints    = np.concatenate([joints, joints], axis = 0)
-                arr         = random.sample(range(len(vid_array)), 
-                                        self.input_size)
-                arr.sort()
-                vid_array   = vid_array[arr]
-                
-                joints      = joints[arr]
+        end = min(len(joints), vid_end)
+        vid_array   = vid_array[vid_start : end]
+        joints      =  joints[vid_start : end]
+
+        if vid_array.shape[0] < self.input_size:
+            n = self.input_size // vid_array.shape[0] + 1
+            vid_array = np.concatenate([vid_array] * n, axis = 0)
+            joints    = np.concatenate([joints] * n, axis = 0)
         
-        # print(joints.shape, vid_array.shape, vid_end - vid_start)
-        # Crop the video to height x height
+        arr         = random.sample(range(len(vid_array)), self.input_size)
+        vid_array   = vid_array[arr]
+        joints      = joints[arr]
+        vid_array, joints = self.crop_video(vid_array, joints)
+
+        # print(vid_array.shape, joints.shape, emotions.shape)
+        # if vid_array.shape[0] == 0 or joints.shape[0] == 0:
+        #     print(vid_array.shape, joints.shape)
+        #     print(path)
+        return vid_array, joints, emotions
+    
+    def get_video(self, fname):
+        vid = []
+        vr = VideoReader(fname, ctx=cpu(0))
+        for i in range(len(vr)):
+            vid.append(vr[i])
+        return np.stack(vid)
+
+    def crop_video(self, vid_array, joints):
         cropped_vid = []
         joint_vec   = []
         vid_height  = vid_array.shape[1]
@@ -148,9 +125,4 @@ class BOLDValLoader(Dataset):
 
         cropped_vid = np.array(cropped_vid)
         joint_vec   = np.array(joint_vec)
-
-        cropped_vid = [to_pil_image(img) for img in cropped_vid]
-        if self.transform:
-            cropped_vid = self.transform(cropped_vid)
-        
-        return cropped_vid, joint_vec, emotions
+        return cropped_vid, joint_vec
