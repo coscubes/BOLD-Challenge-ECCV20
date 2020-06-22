@@ -96,11 +96,11 @@ optmizer    = Adam(net.parameters(), lr = config.learning_rate)
 criterion   = torch.nn.MSELoss(reduction='sum')
 
 print("we reached here")
-for i, (vid, joints, emo) in enumerate(train_loader):
+for i, (vid, joints, emo) in enumerate(train_data):
     # vid, joints, emo    = train_data[i]
     if i % 100 == 0:
         print("reached", i)
-    print(vid.shape, joints.shape, emo.shape)
+    # print(vid.shape, joints.shape, emo.shape)
     # vid                 = np.transpose(vid,(0, 3,1,2))
     # vid                 = vid.to(device)
     # print(vid.shape)
@@ -112,7 +112,7 @@ for i, (vid, joints, emo) in enumerate(train_loader):
     # optmizer.step()
     # print(loss)
 
-for i, (vid, joints, emo) in enumerate(val_loader):
+for i, (vid, joints, emo) in enumerate(val_data):
     # vid, joints, emo    = train_data[i]
     if i % 100 == 0:
         print("reached", i)
