@@ -1,19 +1,19 @@
 # Path to dataset (str)
 # "/src/BOLD_public/"
 # "/media/kaustubh/New_Volume/kaustubh_imp/datasets/BOLD_public/"
-dataset_root    = "/media/kaustubh/New_Volume/kaustubh_imp/datasets/BOLD_public/"
+dataset_root    = "/src/BOLD_public/"
 
 # Learning Rate (float) <1.0
 learning_rate   = 0.1
 
 # Batch_size (int)
-batch_size      = 4
+batch_size      = 8
 
 # Number of epochs
 num_epochs      = 10
 
 # Number for frames for inputting the data (int)
-input_frames    = 16
+input_frames    = 32
 
 # Number of processes to launch
 num_workers     = 10
@@ -28,4 +28,4 @@ device          = None
 logits          = 29
 
 # TODO Sets GPU ID on the server
-server          = False
+server          = True

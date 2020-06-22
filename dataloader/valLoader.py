@@ -78,7 +78,7 @@ class BOLDValLoader(Dataset):
         # if vid_array.shape[0] == 0 or joints.shape[0] == 0:
         #     print(vid_array.shape, joints.shape)
         #     print(path)
-        return vid_array, joints, emotions
+        return torch.Tensor(vid_array).div(255.0), torch.Tensor(joints), torch.Tensor(emotions)
     
     def get_video(self, fname):
         vid = []

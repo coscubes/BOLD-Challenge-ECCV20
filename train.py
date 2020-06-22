@@ -81,12 +81,18 @@ model       = InceptionI3d(num_classes=400, in_channels=3)
 model.load_state_dict(torch.load("checkpoints/rgb_imagenet.pt"))
 model.replace_logits(config.logits)
 model.to(device)
-optmizer    = Adam(model.parameters(), lr = config.learning_rate)
+optimizer   = Adam(model.parameters(), lr = config.learning_rate)
 
-print("We reached here")
-
-for epoch in range(len(config.num_epochs)):
+for epoch in range(config.num_epochs):
+    print("Starting epoch Num:", (epoch+1))
     for i, (vid, joints, emotions) in enumerate(train_loader):
+        optimizer.zero_grad()
+        vid     = vid.to(device)
+        emotions= emotions.to(device)
+        joints  = joints.to(device)
+        # torch.Size([8, 32, 224, 224, 3])
         preds   = model(vid)
         loss    = criterion(preds, emotions)
-
+        print(loss)
+        loss.backward()
+        optimizer.step()
