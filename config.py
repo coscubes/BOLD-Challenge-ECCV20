@@ -1,7 +1,7 @@
 # Path to dataset (str)
 # "/src/BOLD_public/"
 # "/media/kaustubh/New_Volume/kaustubh_imp/datasets/BOLD_public/"
-dataset_root    = "/src/BOLD_public/"
+dataset_root    = "/media/kaustubh/New_Volume/kaustubh_imp/datasets/BOLD_public/"
 
 # Learning Rate (float) <1.0
 learning_rate   = 0.1
@@ -28,4 +28,4 @@ device          = None
 logits          = 29
 
 # TODO Sets GPU ID on the server
-server          = True
+server          = False
