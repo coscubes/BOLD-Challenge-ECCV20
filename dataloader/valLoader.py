@@ -11,7 +11,7 @@ from    decord import VideoReader
 from    decord import cpu, gpu
 import  decord
 
-class BOLDTrainLoader(Dataset):
+class BOLDValLoader(Dataset):
     def __init__(self, dataroot = None, input_size = 32, height = 256, transform=None):
         super().__init__()
         # We have modified the orginal annotations to discard the 
