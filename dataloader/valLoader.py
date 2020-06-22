@@ -116,7 +116,8 @@ class BOLDValLoader(Dataset):
 
             frame = vid_array[i][ int(top):int(bottom), int(left):int(right)]
             if frame.shape != (224, 224, 3):
-                print(vid_height, vid_width, x, y, top, bottom, left, right, frame.shape)
+                frame = cv2.resize(frame, (self.height, self.height))
+                print("frame error")
             cropped_vid.append(frame)
             j_frame     = j_frame[2:].reshape(18, 3)
             j_frame     -= np.array([x, y, 0])
@@ -126,3 +127,4 @@ class BOLDValLoader(Dataset):
         cropped_vid = np.array(cropped_vid)
         joint_vec   = np.array(joint_vec)
         return cropped_vid, joint_vec
+        
