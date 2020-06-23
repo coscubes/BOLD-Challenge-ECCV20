@@ -29,3 +29,6 @@ logits          = 29
 
 # TODO Sets GPU ID on the server
 server          = True
+
+# Checkpoints save path
+model_path      = "checkpoints/I3D/"
