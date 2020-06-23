@@ -16,9 +16,10 @@ from    dataloader.valLoader import *
 # Credits to https://github.com/piergiaj/pytorch-i3d for I3D
 from    models.I3D import InceptionI3d
 
-# Set the right GPU on server
 import os
+import time
 
+# Set the right GPU on server  
 if config.server:
     os.environ["CUDA_VISIBLE_DEVICES"]="3"
 
@@ -84,6 +85,10 @@ model.to(device)
 optimizer   = Adam(model.parameters(), lr = config.learning_rate)
 
 for epoch in range(config.num_epochs):
+    total_train_loss = 0.0
+    total_val_loss   = 0.0
+    epoch_start = time.time()
+    num_iter    = 0
     print("Starting epoch Num:", (epoch+1))
     for i, (vid, joints, emotions) in enumerate(train_loader):
         optimizer.zero_grad()
@@ -93,6 +98,24 @@ for epoch in range(config.num_epochs):
         # torch.Size([8, 32, 224, 224, 3])
         preds   = model(vid)
         loss    = criterion(preds, emotions)
-        print(loss)
+        total_train_loss += loss
         loss.backward()
         optimizer.step()
+        num_iter += 1
+
+    print("Train Loss = ", total_train_loss / num_iter)
+
+    num_iter = 0
+    
+    with torch.no_grad():
+        for i, (vid, joints, emotions) in enumerate(val_loader):
+            optimizer.zero_grad()
+            vid     = vid.to(device)
+            emotions= emotions.to(device)
+            joints  = joints.to(device)
+            preds   = model(vid)
+            loss    = criterion(preds, emotions)
+            total_val_loss += loss
+            num_iter += 1
+    print("Validations Loss = ", total_val_loss / num_iter)
+    print("Epoch time taken = ", time.time() - epoch_start)
