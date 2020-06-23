@@ -1,12 +1,12 @@
-import numpy as np
-import csv
-import cv2
-from torch.utils.data import Dataset, DataLoader
-from torchvision import transforms, utils
-from torchvision.transforms.functional import to_pil_image
-import skvideo.io
-import random
-
+import  numpy as np
+import  csv
+import  cv2
+from    torch.utils.data import Dataset
+from    torchvision import transforms, utils
+import  torch
+import  skvideo.io
+import  random
+from    torchvision.transforms.functional import to_pil_image
 from    decord import VideoReader
 from    decord import cpu, gpu
 import  decord
@@ -78,6 +78,8 @@ class BOLDValLoader(Dataset):
         # if vid_array.shape[0] == 0 or joints.shape[0] == 0:
         #     print(vid_array.shape, joints.shape)
         #     print(path)
+        vid_array  = vid_array.transpose([3,0,1,2])
+        emotions   = np.array([emotions, emotions, emotions]).T
         return torch.Tensor(vid_array).div(255.0), torch.Tensor(joints), torch.Tensor(emotions)
     
     def get_video(self, fname):
