@@ -28,6 +28,16 @@ class BOLDTestLoader(Dataset):
         reader      = csv.reader(open(self.dataroot + "annotations_modified/val.csv", "r"), 
                                 delimiter=",")
         self.data   = list(reader)
+        rejected    = csv.reader(open(self.dataroot + "annotations_modified/val_rejected.csv", "r"), 
+                                delimiter=",")
+        rejected    = [i[0] for  i in list(rejected)]
+        temp        = []
+        for i in range(len(self.data)):
+            if self.data[i][0] in rejected:
+                continue
+            else:
+                temp.append(self.data[i])
+        self.data   = temp
         self.transform = transform
 
     def __len__(self):
