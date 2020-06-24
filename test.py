@@ -38,4 +38,8 @@ model.eval()
 
 for i, (vid, joints, emotions) in enumerate(test_loader):
     print(type(vid))
+    vid_array = vid.cpu().detach().numpy()
+    joints_array = joints.cpu().detach().numpy()
+    emotions_array = emotions.cpu().detach().numpy()
+    print(vid_array.shape,joints_array.shape)
     break
