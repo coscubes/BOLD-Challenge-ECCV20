@@ -43,6 +43,8 @@ for i, (vid, joints, emotions) in enumerate(test_loader):
     vid_array = vid.cpu().detach().numpy()
     joints_array = joints.cpu().detach().numpy()
     #emotions_array = emotions.cpu().detach().numpy()
+    emotions= emotions.to(device)
+    emotions = emotions.squeeze()
     print(vid_array.shape,joints_array.shape)
     pred_avg = []
     for count in range(config.test_frames):
