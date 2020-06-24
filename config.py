@@ -32,3 +32,6 @@ server          = True
 
 # Checkpoints save path
 model_path      = "checkpoints/I3D/"
+
+# Checkpoint Index for testing
+checkpoint_index = 39
