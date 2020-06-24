@@ -35,3 +35,6 @@ model_path      = "checkpoints/I3D/"
 
 # Checkpoint Index for testing
 checkpoint_index = 39
+
+# No. testing frames
+test_frames = 5
