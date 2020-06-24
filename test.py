@@ -47,7 +47,7 @@ for i, (vid, joints, emotions) in enumerate(test_loader):
     for count in range(config.test_frames):
         arr = random.sample(range(vid_array.shape[2]), config.input_frames)
         vid_tensor = torch.from_numpy(vid_array[:,:,arr,:,:]).to(device)
-        joints_tensor = torch.from_numpy(vid_array[:,arr,:]).to(device)
+        joints_tensor = torch.from_numpy(joints_array[:,arr,:]).to(device)
         pred = model(vid_tensor)
         pred_avg.append(pred)
     pred_avg = torch.stack(pred_avg)
