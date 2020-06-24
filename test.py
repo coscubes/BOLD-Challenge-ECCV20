@@ -38,6 +38,7 @@ print("Using ", device, " for testing")
 model = InceptionI3d(num_classes=29, in_channels=3)
 model.load_state_dict(torch.load(config.model_path + "model-epoch-" + str(config.checkpoint_index) + ".pt"))
 criterion   = torch.nn.MSELoss(reduction='sum')
+model.to(device)
 model.eval()
 loss = 0
 for i, (vid, joints, emotions) in enumerate(test_loader):
