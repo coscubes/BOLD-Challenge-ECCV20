@@ -16,7 +16,8 @@ test_data = BOLDTestLoader(
     dataroot    = config.dataset_root,
     input_size  = config.input_frames,
     height      = config.height,
-    transform   = None
+    transform   = None,
+    test_frames = config.test_frames
 )
 
 test_loader = DataLoader(
@@ -41,16 +42,15 @@ model.eval()
 loss = 0
 for i, (vid, joints, emotions) in enumerate(test_loader):
     print(i)
-    vid_array = vid.cpu().detach().numpy()
-    joints_array = joints.cpu().detach().numpy()
+    vid_collec = vid.cpu().detach().numpy()
+    joints_collec = joints.cpu().detach().numpy()
     #emotions_array = emotions.cpu().detach().numpy()
     emotions= emotions.to(device)
     emotions = emotions.squeeze()
     pred_avg = []
     for count in range(config.test_frames):
-        arr = random.sample(range(vid_array.shape[2]), config.input_frames)
-        vid_tensor = torch.from_numpy(vid_array[:,:,arr,:,:]).to(device)
-        joints_tensor = torch.from_numpy(joints_array[:,arr,:]).to(device)
+        vid_tensor = torch.from_numpy(vid_collec[count]).to(device)
+        joints_tensor = torch.from_numpy(joints_collec[count]).to(device)
         pred = model(vid_tensor)
         pred = pred.squeeze()
         pred_avg.append(pred)

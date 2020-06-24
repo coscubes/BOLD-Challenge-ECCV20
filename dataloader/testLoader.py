@@ -12,7 +12,7 @@ import  decord
 
 
 class BOLDTestLoader(Dataset):
-    def __init__(self, dataroot = None, input_size = 32,height = 256, transform=None):
+    def __init__(self, dataroot = None, input_size = 32,height = 256, transform=None,test_frames=5):
         super().__init__()
         # We have modified the orginal annotations to discard the 
         # unrequired data and restructure it.
@@ -22,6 +22,7 @@ class BOLDTestLoader(Dataset):
         self.dataroot       = dataroot
         self.input_size     = input_size
         self.height         = height
+        self.test_frames = test_frames
         decord.bridge.set_bridge('torch')
 
         # Read data from CSV
@@ -70,13 +71,20 @@ class BOLDTestLoader(Dataset):
             joints    = np.concatenate([joints] * n, axis = 0)
 
         vid_array, joints = self.crop_video(vid_array, joints)
+        vid_collec = []
+        joints_collec = []
+        for _ in range(self.test_frames):
+            arr = random.sample(range(len(vid_array)), self.input_size)
+            vid_collec.append(vid_array[arr])
+            joints_collec.append(joints[arr])
+
         # print(vid_array.shape, joints.shape, emotions.shape)
         # if vid_array.shape[0] == 0 or joints.shape[0] == 0:
         #     print(vid_array.shape, joints.shape)
         #     print(path)
-        vid_array  = vid_array.transpose([3,0,1,2])
+        vid_collec  = vid_collec.transpose([0,4,1,2,3])
         emotions   = np.array([emotions, emotions, emotions]).T
-        return torch.Tensor(vid_array).div(255.0), torch.Tensor(joints), torch.Tensor(emotions)
+        return torch.Tensor(vid_collec).div(255.0), torch.Tensor(joints_collec), torch.Tensor(emotions)
     
     def get_video(self, fname):
         vid = []
