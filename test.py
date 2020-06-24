@@ -51,5 +51,5 @@ for i, (vid, joints, emotions) in enumerate(test_loader):
         pred = model(vid_tensor)
         pred_avg.append(pred)
     pred_avg = torch.stack(pred_avg)
-    print(type(pred_avg))
+    print(pred_avg.size())
     break
