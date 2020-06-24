@@ -35,7 +35,7 @@ else:
 print("Using ", device, " for testing")
 
 #model = torch.load(config.model_path + "full_model.pt")
-model = InceptionI3d(num_classes=400, in_channels=3)
+model = InceptionI3d(num_classes=29, in_channels=3)
 model.load_state_dict(torch.load(config.model_path + "model-epoch-" + str(config.checkpoint_index) + ".pt"))
 criterion   = torch.nn.MSELoss(reduction='sum')
 model.eval()
