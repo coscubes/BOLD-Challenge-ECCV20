@@ -37,7 +37,7 @@ model = torch.load(config.model_path + "full_model.pt")
 model.load_state_dict(torch.load(config.model_path + "model-epoch-" + str(config.checkpoint_index) + ".pt"))
 criterion   = torch.nn.MSELoss(reduction='sum')
 model.eval()
-
+loss = 0
 for i, (vid, joints, emotions) in enumerate(test_loader):
     print(type(vid))
     vid_array = vid.cpu().detach().numpy()
@@ -56,5 +56,6 @@ for i, (vid, joints, emotions) in enumerate(test_loader):
         pred_avg.append(pred)
     pred_avg = torch.stack(pred_avg)
     pred_avg = torch.mean(pred_avg,dim=0)
-    loss    = criterion(pred_avg, emotions)
-    break
+    loss   += criterion(pred_avg, emotions)
+
+print(loss,loss/i)
