@@ -4,7 +4,6 @@ from    torch.utils.data import DataLoader
 
 import  config
 from    dataloader.testLoader import *
-from    models.I3D import InceptionI3d
 
 import os
 import time
@@ -41,6 +40,7 @@ model.to(device)
 model.eval()
 loss = 0
 for i, (vid, joints, emotions) in enumerate(test_loader):
+    print(i)
     vid_array = vid.cpu().detach().numpy()
     joints_array = joints.cpu().detach().numpy()
     #emotions_array = emotions.cpu().detach().numpy()
@@ -52,14 +52,11 @@ for i, (vid, joints, emotions) in enumerate(test_loader):
         vid_tensor = torch.from_numpy(vid_array[:,:,arr,:,:]).to(device)
         joints_tensor = torch.from_numpy(joints_array[:,arr,:]).to(device)
         pred = model(vid_tensor)
-        del vid_tensor
-        del joints_tensor
         pred = pred.squeeze()
         pred_avg.append(pred)
     pred_avg = torch.stack(pred_avg)
     pred_avg = torch.mean(pred_avg,dim=0)
     loss   += criterion(pred_avg, emotions)
-    del pred_avg
-    torch.cuda.empty_cache()
+
 
 print(loss,loss/i)
