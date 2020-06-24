@@ -55,9 +55,14 @@ for i, (vid, joints, emotions) in enumerate(test_loader):
         pred = model(vid_tensor)
         pred = pred.squeeze()
         pred_avg.append(pred)
+        del vid_tensor
+        del joints_tensor
+        torch.cuda.empty_cache()
     pred_avg = torch.stack(pred_avg)
     pred_avg = torch.mean(pred_avg,dim=0)
     loss   += criterion(pred_avg, emotions)
+    del pred_avg
+    torch.cuda.empty_cache()
 
 
 print(loss,loss/i)
