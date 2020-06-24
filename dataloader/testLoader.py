@@ -91,7 +91,7 @@ class BOLDTestLoader(Dataset):
         vid_height  = vid_array.shape[1]
         vid_width   = vid_array.shape[2]
 
-        for i in range(self.input_size):
+        for i in range(vid_array.shape[0]):
             j_frame = joints[i]
             x,y,z   = np.mean(j_frame[2:].reshape(18, 3), axis=0)
             
