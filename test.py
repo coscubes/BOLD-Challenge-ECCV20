@@ -51,7 +51,7 @@ for i, (vid, joints, emotions) in enumerate(test_loader):
     print(vid_collec.shape,joints_collec.shape)
     for count in range(config.test_frames):
         vid_tensor = torch.from_numpy(vid_collec[count]).to(device)
-        joints_tensor = torch.from_numpy(joints_collec[count]).to(device)
+        joints_tensor = torch.from_numpy(joints_collec[count]).to(device).unsqueeze(0)
         pred = model(vid_tensor)
         pred = pred.squeeze()
         pred_avg.append(pred)
