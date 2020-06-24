@@ -4,6 +4,7 @@ from    torch.utils.data import DataLoader
 
 import  config
 from    dataloader.testLoader import *
+from    models.I3D import InceptionI3d
 
 import os
 import time
@@ -33,7 +34,8 @@ else:
 
 print("Using ", device, " for testing")
 
-model = torch.load(config.model_path + "full_model.pt")
+#model = torch.load(config.model_path + "full_model.pt")
+model = InceptionI3d(num_classes=400, in_channels=3)
 model.load_state_dict(torch.load(config.model_path + "model-epoch-" + str(config.checkpoint_index) + ".pt"))
 criterion   = torch.nn.MSELoss(reduction='sum')
 model.eval()
@@ -50,13 +52,13 @@ for i, (vid, joints, emotions) in enumerate(test_loader):
         vid_tensor = torch.from_numpy(vid_array[:,:,arr,:,:]).to(device)
         joints_tensor = torch.from_numpy(joints_array[:,arr,:]).to(device)
         pred = model(vid_tensor)
-        vid_tensor.detach()
-        joints_tensor.detach()
+        #vid_tensor.detach()
+        #joints_tensor.detach()
         pred = pred.squeeze()
         pred_avg.append(pred)
     pred_avg = torch.stack(pred_avg)
     pred_avg = torch.mean(pred_avg,dim=0)
     loss   += criterion(pred_avg, emotions)
-    pred_avg.detach()
+    #pred_avg.detach()
 
 print(loss,loss/i)
