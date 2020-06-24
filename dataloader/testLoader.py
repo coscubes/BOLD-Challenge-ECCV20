@@ -77,7 +77,8 @@ class BOLDTestLoader(Dataset):
             arr = random.sample(range(len(vid_array)), self.input_size)
             vid_collec.append(vid_array[arr])
             joints_collec.append(joints[arr])
-
+        vid_collec = np.array(vid_collec)
+        joints_collec = np.array(joints_collec)
         # print(vid_array.shape, joints.shape, emotions.shape)
         # if vid_array.shape[0] == 0 or joints.shape[0] == 0:
         #     print(vid_array.shape, joints.shape)
