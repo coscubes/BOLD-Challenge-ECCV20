@@ -85,7 +85,7 @@ class BOLDTestLoader(Dataset):
         #     print(path)
         vid_collec  = vid_collec.transpose([0,4,1,2,3])
         emotions   = np.array([emotions, emotions, emotions]).T
-        return torch.Tensor(vid_collec).div(255.0).squeeze(), torch.Tensor(joints_collec).squeeze(), torch.Tensor(emotions)
+        return vid_collec/255.0,joints_collec, torch.Tensor(emotions)
     
     def get_video(self, fname):
         vid = []

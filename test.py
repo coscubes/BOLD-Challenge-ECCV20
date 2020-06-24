@@ -42,8 +42,8 @@ model.eval()
 loss = 0
 for i, (vid, joints, emotions) in enumerate(test_loader):
     print(i)
-    vid_collec = np.squeeze(vid.cpu().detach().numpy())
-    joints_collec = np.squeeze(joints.cpu().detach().numpy())
+    vid_collec = np.squeeze(vid)
+    joints_collec = np.squeeze(joints)
     #emotions_array = emotions.cpu().detach().numpy()
     emotions= emotions.to(device)
     emotions = emotions.squeeze()
