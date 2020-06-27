@@ -13,7 +13,7 @@ from    torchvideotransforms.volume_transforms import *
 from    torchvideotransforms.stack_transforms import *
 
 import  config
-from    dataloader.trainLoader import *
+from    dataloader.trainLoader_Skepxles import *
 from    dataloader.valLoader import *
 import os
 
@@ -42,23 +42,24 @@ train_data = BOLDTrainLoader(
     dataroot    = config.dataset_root,
     input_size  = config.input_frames,
     height      = config.height,
-    transform   = train_transforms
+    transform   = train_transforms,
+    skep_thresh = 10
 )
-
+'''
 val_data =  BOLDValLoader(
     dataroot    = config.dataset_root,
     input_size  = config.input_frames,
     height      = config.height,
     transform   = val_transforms
 )
-
+'''
 train_loader = DataLoader(
     dataset     = train_data,
     batch_size  = config.batch_size,
     shuffle     = True,
     num_workers = config.num_workers
 )
-
+'''
 val_loader = DataLoader(
     dataset     = val_data,
     batch_size  = config.batch_size,
@@ -96,6 +97,7 @@ optmizer    = Adam(net.parameters(), lr = config.learning_rate)
 criterion   = torch.nn.MSELoss(reduction='sum')
 
 print("we reached here")
+'''
 for i, (vid, joints, emo) in enumerate(train_loader):
     # vid, joints, emo    = train_data[i]
     if i % 100 == 0:
@@ -111,8 +113,9 @@ for i, (vid, joints, emo) in enumerate(train_loader):
     # loss.backward()
     # optmizer.step()
     # print(loss)
-
+'''
 for i, (vid, joints, emo) in enumerate(val_loader):
     # vid, joints, emo    = train_data[i]
     if i % 100 == 0:
         print("reached", i)
+'''
