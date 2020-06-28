@@ -6,13 +6,13 @@ from    torchvision import transforms, utils
 import  torch
 import  skvideo.io
 import  random
-from    torchvision.transforms.functional import to_pil_image
 from    decord import VideoReader
 from    decord import cpu, gpu
 import  decord
 
-class BOLDTrainLoader(Dataset):
-    def __init__(self, dataroot = None, input_size = 32, height = 256, transform=None,skep_thresh = 10):
+
+class BOLDTestLoader(Dataset):
+    def __init__(self, dataroot = None, input_size = 32,height = 256, transform=None,test_frames=5,skep_thresh=10):
         super().__init__()
         # We have modified the orginal annotations to discard the 
         # unrequired data and restructure it.
@@ -22,14 +22,15 @@ class BOLDTrainLoader(Dataset):
         self.dataroot       = dataroot
         self.input_size     = input_size
         self.height         = height
+        self.test_frames = test_frames
         self.skep_thresh = skep_thresh
         decord.bridge.set_bridge('torch')
 
         # Read data from CSV
-        reader      = csv.reader(open(self.dataroot + "annotations_modified/train.csv", "r"), 
+        reader      = csv.reader(open(self.dataroot + "annotations_modified/val.csv", "r"), 
                                 delimiter=",")
         self.data   = list(reader)
-        rejected    = csv.reader(open(self.dataroot + "annotations_modified/train_rejected.csv", "r"), 
+        rejected    = csv.reader(open(self.dataroot + "annotations_modified/val_rejected.csv", "r"), 
                                 delimiter=",")
         rejected    = [i[0] for  i in list(rejected)]
         temp        = []
@@ -51,7 +52,7 @@ class BOLDTrainLoader(Dataset):
         person_id   = int(round(float(self.data[index][-3])))
         emotions    = np.array(self.data[index][1:-3], dtype=np.float)
         joints      = np.load(self.dataroot + "joints/" + path[:-4] + ".npy")
-        joints      = joints[np.where(joints[:,1] == person_id)]
+        joints      = joints[np.where(joints[:,1] == person_id)] 
         vid_array   = None
         
         try:
@@ -69,22 +70,24 @@ class BOLDTrainLoader(Dataset):
             n = self.input_size // vid_array.shape[0] + 1
             vid_array = np.concatenate([vid_array] * n, axis = 0)
             joints    = np.concatenate([joints] * n, axis = 0)
-        
-        arr         = random.sample(range(len(vid_array)), self.input_size)
-        vid_array   = vid_array[arr]
-        joints      = joints[arr]
-        vid_array = self.crop_video(vid_array,joints)
-        skepxles = self.compute_skepxles(joints[:,2:])
-        
+
+        vid_array = self.crop_video(vid_array, joints)
+        vid_collec = []
+        skepxles_collec = []
+        for _ in range(self.test_frames):
+            arr = random.sample(range(len(vid_array)), self.input_size)
+            vid_collec.append(vid_array[arr])
+            skepxles_collec.append(self.compute_skepxles(joints[:,2:]))
+        vid_collec = np.array(vid_collec)
+        skepxles_collec = np.array(skepxles_collec)
         # print(vid_array.shape, joints.shape, emotions.shape)
         # if vid_array.shape[0] == 0 or joints.shape[0] == 0:
         #     print(vid_array.shape, joints.shape)
         #     print(path)
-        vid_array  = vid_array.transpose([3,0,1,2])
-        skepxles = skepxles.transpose([2,0,1])
-        return torch.Tensor(vid_array).div(255.0), torch.Tensor(skepxles), torch.Tensor(emotions)
+        vid_collec  = vid_collec.transpose([0,4,1,2,3])
+        skepxles_collec = skepxles_collec.transpose([0,3,1,2])
+        return torch.Tensor(vid_collec).div(255.0),torch.Tensor(skepxles_collec), torch.Tensor(emotions)
     
-
     def transform_joints(self,joint):
         joint_len = joint.shape[0]
         ret = np.zeros((joint_len//3,3))

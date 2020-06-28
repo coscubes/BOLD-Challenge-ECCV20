@@ -11,7 +11,7 @@ from    decord import VideoReader
 from    decord import cpu, gpu
 import  decord
 
-class BOLDTrainLoader(Dataset):
+class BOLDValLoader(Dataset):
     def __init__(self, dataroot = None, input_size = 32, height = 256, transform=None,skep_thresh = 10):
         super().__init__()
         # We have modified the orginal annotations to discard the 
@@ -26,10 +26,10 @@ class BOLDTrainLoader(Dataset):
         decord.bridge.set_bridge('torch')
 
         # Read data from CSV
-        reader      = csv.reader(open(self.dataroot + "annotations_modified/train.csv", "r"), 
+        reader      = csv.reader(open(self.dataroot + "annotations_modified/val.csv", "r"), 
                                 delimiter=",")
         self.data   = list(reader)
-        rejected    = csv.reader(open(self.dataroot + "annotations_modified/train_rejected.csv", "r"), 
+        rejected    = csv.reader(open(self.dataroot + "annotations_modified/val_rejected.csv", "r"), 
                                 delimiter=",")
         rejected    = [i[0] for  i in list(rejected)]
         temp        = []
@@ -43,7 +43,7 @@ class BOLDTrainLoader(Dataset):
 
     def __len__(self):
         return len(self.data)
-    
+   
     def __getitem__(self, index):
         path        = self.data[index][0]
         vid_start   = int(self.data[index][-2])
