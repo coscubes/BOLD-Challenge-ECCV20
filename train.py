@@ -86,7 +86,7 @@ optimizer   = Adam(model.parameters(), lr = config.learning_rate)
 
 
 # Save an initial fully constructed model
-# torch.save(model, config.model_path + "full_model.pt")
+torch.save(model, config.model_path + "full_model.pt")
 
 for epoch in range(config.num_epochs):
     total_train_loss = 0.0
@@ -123,4 +123,4 @@ for epoch in range(config.num_epochs):
             num_iter += 1
     print("Validations Loss = ", total_val_loss / num_iter)
     print("Epoch time taken = ", time.time() - epoch_start)
-    # torch.save(model.state_dict(), config.model_path + "model-epoch-" + str(epoch) + ".pt")
+    torch.save(model.state_dict(), config.model_path + "model-epoch-" + str(epoch) + ".pt")

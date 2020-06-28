@@ -11,7 +11,7 @@ learning_rate   = 0.1
 batch_size      = 16
 
 # Number of epochs
-num_epochs      = 40
+num_epochs      = 30
 
 # Number for frames for inputting the data (int)
 input_frames    = 32
