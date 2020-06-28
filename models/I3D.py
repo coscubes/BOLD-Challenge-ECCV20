@@ -190,7 +190,7 @@ class InceptionI3d(nn.Module):
     )
 
     def __init__(self, num_classes=400, spatial_squeeze=True,
-                 final_endpoint='Logits', name='inception_i3d', in_channels=3, dropout_keep_prob=0.5):
+                 final_endpoint='Logits', name='inception_i3d', in_channels=3, dropout_keep_prob=0.5, mode=1):
         """Initializes I3D model instance.
         Args:
           num_classes: The number of outputs in the logit layer (default 400, which
@@ -215,6 +215,7 @@ class InceptionI3d(nn.Module):
         self._num_classes = num_classes
         self._spatial_squeeze = spatial_squeeze
         self._final_endpoint = final_endpoint
+        self.modality = mode
         self.logits = None
 
         if self._final_endpoint not in self.VALID_ENDPOINTS:
@@ -327,10 +328,19 @@ class InceptionI3d(nn.Module):
             if end_point in self.end_points:
                 x = self._modules[end_point](x) # use _modules to work with dataparallel
 
+        if self.modality == 2:
+            y = self.avg_pool(x)
+            return y.flatten(start_dim=1)
         x = self.logits(self.dropout(self.avg_pool(x)))
         if self._spatial_squeeze:
             logits = x.squeeze(3).squeeze(3)
         # logits is batch X time X classes, which is what we want to work with
+        else:
+            return x
+
+        logits = nn.functional.avg_pool1d(logits, 3)
+        logits = logits.squeeze(2)
+
         return logits
         
 
