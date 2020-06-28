@@ -3,7 +3,7 @@ import  torch.nn as nn
 from    torch.utils.data import DataLoader
 
 import  config
-from    dataloader.testLoader import *
+from    dataloader.testLoader_Skepxles import *
 
 import os
 import time
@@ -44,30 +44,29 @@ model.eval()
 loss = 0
 mAP = 0
 mRA = 0
+
 with torch.no_grad():
-    for i, (vid, joints, emotions) in enumerate(test_loader):
+    for i, (vid, skepxles, emotions) in enumerate(test_loader):
         if i%100 == 0:
             print(i)
         vid = vid.to(device)
-        joints = joints.to(device)
+        skepxles = skepxles.to(device)
         emotions= emotions.to(device)
-        emotions = emotions.squeeze()
         pred_avg = []
         for count in range(config.test_frames):
             vid_tensor = vid[:,count,:,:,:,:]
-            joints_tensor = joints[:,count,:]
-            pred = model(vid_tensor)
+            skepxles_tensor = skepxles[:,count,:,:,:]
+            pred = model(vid_tensor,skepxles_tensor)
             pred = pred.squeeze()
             pred_avg.append(pred)
             del vid_tensor
-            del joints_tensor
+            del skepxles_tensor
             torch.cuda.empty_cache()
         pred_avg = torch.stack(pred_avg)
         pred_avg = torch.mean(pred_avg,dim=0)
-        loss   += criterion(pred_avg[:,26:], emotions[:,26:])
+        loss   += criterion(pred_avg, emotions)
         mAP += average_precision_score(emotions[:,:26], pred_avg[:,:26])
         mRA += roc_auc_score(emotions[:,:26], pred_avg[:,:26])
-        
 
         del pred_avg
         torch.cuda.empty_cache()
@@ -82,4 +81,5 @@ print("ERS : ",ERS)
 print("mRA : ",mRA)
 print("mAP : ",mAP)
 print("mRR : ",mR)
+
 

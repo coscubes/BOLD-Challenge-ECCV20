@@ -114,7 +114,7 @@ for epoch in range(config.num_epochs):
             vid     = vid.to(device)
             emotions= emotions.to(device)
             joints  = joints.to(device)
-            preds   = model(vid)
+            preds   = model(vid,joints)
             loss    = criterion(preds, emotions)
             total_val_loss += loss
             num_iter += 1
