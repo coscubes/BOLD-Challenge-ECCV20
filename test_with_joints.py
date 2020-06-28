@@ -10,7 +10,7 @@ import time
 import random
 from sklearn.metrics import average_precision_score
 from sklearn.metrics import roc_auc_score
-
+from sklearn.metrics import r2_score
 if config.server:
     os.environ["CUDA_VISIBLE_DEVICES"]="3"
 
@@ -41,7 +41,8 @@ model.load_state_dict(torch.load(config.model_path + "model-epoch-" + str(config
 criterion   = torch.nn.MSELoss(reduction='sum')
 model.to(device)
 model.eval()
-loss = 0
+emotions_record = []
+pred_record = []
 mAP = 0
 mRA = 0
 
@@ -52,6 +53,7 @@ with torch.no_grad():
         vid = vid.to(device)
         skepxles = skepxles.to(device)
         emotions= emotions.to(device)
+        emotions = emotions.squeeze()
         pred_avg = []
         for count in range(config.test_frames):
             vid_tensor = vid[:,count,:,:,:,:]
@@ -64,15 +66,22 @@ with torch.no_grad():
             torch.cuda.empty_cache()
         pred_avg = torch.stack(pred_avg)
         pred_avg = torch.mean(pred_avg,dim=0)
-        loss   += criterion(pred_avg, emotions)
-        mAP += average_precision_score(emotions[:,:26], pred_avg[:,:26])
-        mRA += roc_auc_score(emotions[:,:26], pred_avg[:,:26])
+        emotions = emotions.detach().cpu().numpy()
+        pred_avg = pred_avg.detach().cpu().numpy()
+        emotions_OH = np.zeros_like(emotions[:26])
+        emotions_OH[np.argmax(emotions[:26])] = 1
+        pred_OH = np.zeros_like(pred_avg[:26])
+        pred_OH[np.argmax(pred_avg[:26])] = 1
+        emotions_record.append(emotions[26:].tolist())
+        pred_record.append(pred_avg[26:].tolist())
+        mAP += average_precision_score(emotions_OH, pred_OH)
+        mRA += roc_auc_score(emotions_OH, pred_OH)
 
         del pred_avg
         torch.cuda.empty_cache()
 
-print(loss,loss/i)
-mR = loss/i
+
+mR = r2_score(np.array(emotions_record),np.array(pred_record))
 mRA = mRA/i
 mAP = mAP/i
 
