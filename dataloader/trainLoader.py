@@ -79,7 +79,7 @@ class BOLDTrainLoader(Dataset):
         #     print(vid_array.shape, joints.shape)
         #     print(path)
         vid_array  = vid_array.transpose([3,0,1,2])
-        emotions   = np.array([emotions, emotions, emotions]).T
+        # emotions   = np.array([emotions, emotions, emotions]).T
         return torch.Tensor(vid_array).div(255.0), torch.Tensor(joints), torch.Tensor(emotions)
     
     def get_video(self, fname):
