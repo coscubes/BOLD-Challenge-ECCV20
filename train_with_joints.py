@@ -76,14 +76,15 @@ else:
 
 print("Using ", device, " for training")
 
-criterion   = torch.nn.MSELoss(reduction='sum')
+mse_loss   = torch.nn.MSELoss(reduction='sum')
+ce_loss = nn.CrossEntropyLoss()
 model       = Two_Stream(class_num=29)
 model.to(device)
 optimizer   = Adam(model.parameters(), lr = config.learning_rate)
 
 
 # Save an initial fully constructed model
-#torch.save(model, config.model_path + "full_model.pt")
+torch.save(model, config.model_path + "full_model.pt")
 
 for epoch in range(config.num_epochs):
     total_train_loss = 0.0
@@ -98,7 +99,10 @@ for epoch in range(config.num_epochs):
         joints  = joints.to(device)
         # torch.Size([8, 32, 224, 224, 3])
         preds   = model(vid,joints)
-        loss    = criterion(preds, emotions)
+        ind = emotions[:,:26].to(device).argmax(1)
+        ce = ce_loss(preds[:,:26],ind)
+        mse = mse_loss(preds[:,26:],emotions[:,26:])
+        loss    = ce + mse
         total_train_loss += loss
         loss.backward()
         optimizer.step()
@@ -115,7 +119,10 @@ for epoch in range(config.num_epochs):
             emotions= emotions.to(device)
             joints  = joints.to(device)
             preds   = model(vid,joints)
-            loss    = criterion(preds, emotions)
+            ind = emotions[:,:26].to(device).argmax(1)
+            ce = ce_loss(preds[:,:26],ind)
+            mse = mse_loss(preds[:,26:],emotions[:,26:])
+            loss    = ce + mse
             total_val_loss += loss
             num_iter += 1
     print("Validations Loss = ", total_val_loss / num_iter)
