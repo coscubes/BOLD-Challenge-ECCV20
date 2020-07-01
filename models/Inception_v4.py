@@ -1,16 +1,16 @@
 # Code Credits
 # https://github.com/Cadene/pretrained-models.pytorch/blob/master/pretrainedmodels/models/inceptionv4.py
 
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-from torch.autograd import Variable
+import  torch
+import  torch.nn as nn
+import  torch.nn.functional as F
+from    torch.autograd import Variable
 
-import numpy as np
+import  numpy as np
 
-import os
-import sys
-from collections import OrderedDict
+import  os
+import  sys
+from    collections import OrderedDict
 
 
 class BasicConv2d(nn.Module):
