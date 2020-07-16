@@ -51,25 +51,29 @@ with torch.no_grad():
         if i%100 == 0:
             print(i)
         vid = vid.to(device)
-        skepxles = skepxles.to(device)
-        emotions= emotions.to(device)
-        emotions = emotions.squeeze()
-        pred_avg = []
+        skepxles    = skepxles.to(device)
+        emotions    = emotions.to(device)
+        emotions    = emotions.squeeze()
+        pred_avg    = []
+
         for count in range(config.test_frames):
-            vid_tensor = vid[:,count,:,:,:,:]
+            vid_tensor      = vid[:,count,:,:,:,:]
             skepxles_tensor = skepxles[:,count,:,:,:]
-            pred = model(vid_tensor,skepxles_tensor)
-            pred = pred.squeeze()
+            pred            = model(vid_tensor,skepxles_tensor)
+            pred            = pred.squeeze()
             pred_avg.append(pred)
             del vid_tensor
             del skepxles_tensor
             torch.cuda.empty_cache()
+
         pred_avg = torch.stack(pred_avg)
         pred_avg = torch.mean(pred_avg,dim=0)
         emotions = emotions.detach().cpu().numpy()
         pred_avg = pred_avg.detach().cpu().numpy()
+
         emotions_OH = np.zeros_like(emotions[:26])
         emotions_OH[np.argmax(emotions[:26])] = 1
+
         pred_OH = np.zeros_like(pred_avg[:26])
         pred_OH[np.argmax(pred_avg[:26])] = 1
         emotions_record.append(emotions[26:].tolist())
@@ -81,7 +85,7 @@ with torch.no_grad():
         torch.cuda.empty_cache()
 
 
-mR = r2_score(np.array(emotions_record),np.array(pred_record))
+mR  = r2_score(np.array(emotions_record),np.array(pred_record))
 mRA = mRA/i
 mAP = mAP/i
 

@@ -74,12 +74,8 @@ class BOLDTrainLoader(Dataset):
         joints      = joints[arr]
         vid_array, joints = self.crop_video(vid_array, joints)
 
-        # print(vid_array.shape, joints.shape, emotions.shape)
-        # if vid_array.shape[0] == 0 or joints.shape[0] == 0:
-        #     print(vid_array.shape, joints.shape)
-        #     print(path)
         vid_array  = vid_array.transpose([3,0,1,2])
-        # emotions   = np.array([emotions, emotions, emotions]).T
+
         return torch.Tensor(vid_array).div(255.0), torch.Tensor(joints), torch.Tensor(emotions)
     
     def get_video(self, fname):
@@ -119,7 +115,6 @@ class BOLDTrainLoader(Dataset):
             frame = vid_array[i][ int(top):int(bottom), int(left):int(right)]
             if frame.shape != (224, 224, 3):
                 frame = cv2.resize(frame, (self.height, self.height))
-                print("frame error")
             cropped_vid.append(frame)
             j_frame     = j_frame[2:].reshape(18, 3)
             j_frame     -= np.array([x, y, 0])

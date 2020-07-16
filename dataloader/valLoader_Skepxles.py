@@ -22,7 +22,7 @@ class BOLDValLoader(Dataset):
         self.dataroot       = dataroot
         self.input_size     = input_size
         self.height         = height
-        self.skep_thresh = skep_thresh
+        self.skep_thresh    = skep_thresh
         decord.bridge.set_bridge('torch')
 
         # Read data from CSV
